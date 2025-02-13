@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA E-Commerce</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Simple E-Commerce</h1>
+    <button onclick="addToCart()">Add to Cart</button>
+    <p id="cart"></p>
+
+    <script>
+        function addToCart() {
+            localStorage.setItem("cart", "1 item");
+            document.getElementById("cart").innerText = "Cart: 1 item";
+        }
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js").then(() => {
+                console.log("Service Worker Registered");
+            });
+        }
+    </script>
+</body>
+</html>
+self.addEventListener("install", (event) => {
+    event.waitUntil(
+        caches.open("static").then((cache) => {
+            return cache.addAll(["index.html", "style.css"]);
+        })
+    );
+});
+
+self.addEventListener("fetch", (event) => {
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
+});
